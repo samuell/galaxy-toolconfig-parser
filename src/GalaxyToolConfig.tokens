@@ -1,0 +1,5 @@
+IF=4
+ELSE=5
+ENDIF=6
+CHAR=7
+WS=8
