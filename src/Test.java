@@ -4,27 +4,62 @@ import org.antlr.runtime.CharStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
+import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.DOTTreeGenerator;
 import org.antlr.runtime.tree.Tree;
 import org.antlr.runtime.tree.TreeAdaptor;
+import org.antlr.stringtemplate.StringTemplate;
 
 public class Test {
+    public static final int EOF=-1;
+    public static final int ELSE=4;
+    public static final int ENDIF=5;
+    public static final int WORD=6;
+    public static final int IF=7;
+    public static final int STRING=8;
+    public static final int VARIABLE=9;
+    public static final int EQTEST=10;
+    public static final int COLON=11;
+    public static final int DBLDASH=12;
+    public static final int EQ=13;
+    public static final int WS=14;
+    
 	public static void main(String[] args) throws RecognitionException {
 		System.out.println("Beginning ...");
-		String testString = "	  sam_to_bampy"
-				+ "      --input1=$source.input1"
-				+ "      --dbkey=${input1.metadata.dbkey}"
-				+ "      #if $source.index_source == \"history\":"
-				+ "        --ref_file=$source.ref_file" + "      #else"
-				+ "        --ref_file=\"None\"" + "      #end if"
-				+ "      --output1=$output1"
-				+ "      --index_dir=${GALAXY_DATA_INDEX_DIR};";
+		String testString = "	sam_to_bam.py" 
+				+ "      --input1=$source.input1\n"
+				+ "      --dbkey=${input1.metadata.dbkey}\n"
+				+ "      #if $source.index_source == \"history\":\n"
+				+ "        --ref_file=$source.ref_file\n" 
+				+ "      #else\n"
+				+ "        --ref_file=\"None\"\n" 
+				+ "      #end if\n"
+				+ "      --output1=$output1\n"
+				+ "      --index_dir=${GALAXY_DATA_INDEX_DIR}\n"; 
 		CharStream charStream = new ANTLRStringStream(testString);
 		GalaxyToolConfigLexer lexer = new GalaxyToolConfigLexer(charStream);
 		TokenStream tokenStream = new CommonTokenStream(lexer);
-		GalaxyToolConfigParser parser = new GalaxyToolConfigParser(tokenStream);
+		GalaxyToolConfigParser parser = new GalaxyToolConfigParser(tokenStream, null);
+		
 		System.out.println("Starting ...");
-		GalaxyToolConfigParser.command_return command = parser.command();
-		System.out.println("Command: " + ((Tree)command.tree).toStringTree());
+		// GalaxyToolConfigParser.command_return command = parser.command();
+		CommonTree tree = (CommonTree)parser.command().getTree();
+		System.out.println("Done executing command ...");
+		
+		// System.out.println("Command: " + ((Tree)command.tree).toStringTree());
+		// CommonTree tree = (CommonTree)parser.command().getTree();
+
+		int i = 0;
+		while (i<tree.getChildCount()) {
+			Tree subTree = tree.getChild(i);
+		    System.out.println("Subtree text: " + subTree.getText() + ", (Token type: " + subTree.getType() + ")");
+		    i++;
+	    }
+		
+		//DOTTreeGenerator gen = new DOTTreeGenerator();
+	    //StringTemplate st = gen.toDOT(tree);
+	    //System.out.println("Tree: \n" + st);
+
 		System.out.println("Done!");
 	}
 }
